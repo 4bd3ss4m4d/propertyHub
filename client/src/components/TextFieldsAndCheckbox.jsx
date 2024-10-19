@@ -57,12 +57,12 @@ export default function TextFieldsAndCheckbox({ data, handleChange }) {
         required
       />
 
-      {/* Phone Number */}
+      {/* phoneNumber Number */}
       <input
         type="text"
-        placeholder="Phone"
-        name="phone"
-        value={data.phone}
+        placeholder="phoneNumber"
+        name="phoneNumber"
+        value={data.phoneNumber}
         onChange={handleChange}
         required
       />

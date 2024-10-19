@@ -10,7 +10,6 @@ import axiosWithHeader from "../services/axios";
 
 export default function Create() { 
 
-
   const API_URL = import.meta.env.VITE_API_URL;
   const { currentUser } = useSelector((state) => state.user); // Access the logged-in user
 
@@ -36,6 +35,11 @@ export default function Create() {
       state: '',
       zipCode: '',
       country: 'Morocco', // Default to "Morocco" if not provided
+    },
+    // Coordinates are fixed and will not be changed in the form
+    coordinates: {
+      lat: 33.5731, 
+      lng: -7.5898
     },
     images: [], // Placeholder for image URLs after upload
     phoneNumber: '',
@@ -79,6 +83,7 @@ export default function Create() {
       bedrooms: Number(data.bedrooms),
       bathrooms: Number(data.bathrooms),
       rooms: Number(data.rooms),
+      agentId: "671305e3bfbb0b7b2ffa0cbb", // Keep agentId hardcoded in submission
     };
 
     const formData = new FormData();
@@ -114,9 +119,7 @@ export default function Create() {
     try {
       await axiosWithHeader.post(`/api/properties`, updatedData)
       .then((response)=>{console.log(response)});
-      alert("Lesting created successfully.")
-      
-
+      alert("Listing created successfully.")
     } catch (error) {
       console.error("Error creating listing:", error);
     }
