@@ -119,7 +119,7 @@ const propertySchema = new mongoose.Schema({
       type: String,
       validate: {
         validator: function (value) {
-          return /^https?:\/\/.+\.(jpg|jpeg|png|webp)$/.test(value); // Validate URLs for images
+          return 
         },
         message: 'Please provide a valid image URL (jpg, jpeg, png, or webp).'
       }

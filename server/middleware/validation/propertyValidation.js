@@ -79,11 +79,6 @@ export const validatePropertyFields = [
     .optional().default('Morocco')
     .isString().withMessage('Country must be a valid string.'),
 
-  body('images.*')
-    .optional()
-    .isURL().withMessage('Each image must be a valid URL (jpg, jpeg, png, or webp).')
-    .matches(/\.(jpg|jpeg|png|webp)$/).withMessage('Image must be a valid format: jpg, jpeg, png, or webp.'),
-
   body('amenities')
     .optional()
     .isArray().withMessage('Amenities must be an array of strings.')
