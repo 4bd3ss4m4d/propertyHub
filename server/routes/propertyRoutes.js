@@ -66,7 +66,7 @@ router.put(
 
 // Delete a property (admin or the property owner)
 router.delete(
-  '/:id', 
+  '/:id',
   authenticateJWT, 
   validateObjectId, 
   checkIsAdminOrOwnerOrAgent, 

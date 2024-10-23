@@ -16,7 +16,7 @@ import { UnauthorizedError, ForbiddenError } from '../../utils/customErrors.js';
  */
 const authenticateJWT = (req, res, next) => {
   // Check if the token is sent in the Authorization header
-  let token = req.header('Authorization')?.replace('Bearer ', '');
+  let token = req.header('authorization')?.replace('Bearer ', '');
 
   // If not, check if the token is stored in a cookie
   if (!token) {

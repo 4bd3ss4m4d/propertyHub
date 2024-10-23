@@ -89,6 +89,10 @@ const propertySchema = new mongoose.Schema({
     required: [true, 'Available date is required.'],
     default: Date.now, // Set default availability to current date
   },
+  userId: {
+    type: String,
+    required: true
+  },
   address: {
     street: {
       type: String,

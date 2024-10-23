@@ -7,14 +7,15 @@ import TextFieldsAndCheckbox from "../components/TextFieldsAndCheckbox";
 import ImageUpload from "../components/ImageUpload";
 import Footer from "../components/Footer";
 import axiosWithHeader from "../services/axios";
+import { Navigate } from "react-router-dom";
 
 export default function Create() { 
-
   const API_URL = import.meta.env.VITE_API_URL;
   const { currentUser } = useSelector((state) => state.user); // Access the logged-in user
 
   const [images, setImages] = useState([]);
   const [data, setData] = useState({
+    userId: currentUser._id,
     title: '',
     description: '',
     propertyType: '',
@@ -36,7 +37,6 @@ export default function Create() {
       zipCode: '',
       country: 'Morocco', // Default to "Morocco" if not provided
     },
-    // Coordinates are fixed and will not be changed in the form
     coordinates: {
       lat: 33.5731, 
       lng: -7.5898
@@ -47,6 +47,8 @@ export default function Create() {
     amenities: [], // Placeholder for amenities
     isFeatured: false, // Track if the listing is featured
   });
+
+  const [redirect, setRedirect] = useState(false); // State for redirecting after successful submission
 
   // Handle file input change for image upload
   const handleFileChange = (event) => {
@@ -75,7 +77,6 @@ export default function Create() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // Convert numeric values before submitting
     const formattedData = {
       ...data,
       price: Number(data.price), // Convert price to a number
@@ -109,17 +110,16 @@ export default function Create() {
 
     // Prepare the final data object with image URLs and ensure proper data types
     const updatedData = {
-      ...formattedData, // Use the formatted data with correct types
-      images: imageUrls, // Add uploaded image URLs
-      offerType: data.offerType.charAt(0).toUpperCase() + data.offerType.slice(1), // Capitalize offerType
+      ...formattedData,
+      images: imageUrls,
+      offerType: data.offerType.charAt(0).toUpperCase() + data.offerType.slice(1),
     };
-    console.log("Property listing created successfully", updatedData);
 
     // Send the data to the backend with JWT token in headers
     try {
-      await axiosWithHeader.post(`/api/properties`, updatedData)
-      .then((response)=>{console.log(response)});
-      alert("Listing created successfully.")
+      await axiosWithHeader.post(`/api/properties`, updatedData);
+      alert("Listing created successfully.");
+      setRedirect(true); // Set redirect to true to navigate
     } catch (error) {
       console.error("Error creating listing:", error);
     }
@@ -134,27 +134,29 @@ export default function Create() {
           key={index}
           src={url}
           alt={`preview ${index}`}
-          className="image-preview" // Added class for image preview styling
+          className="image-preview"
           style={{ width: "100px", height: "100px", objectFit: "cover", margin: "5px" }}
         />
       );
     });
   };
 
+  // Redirect after successful submission
+  if (redirect) {
+    return <Navigate to="/" />;
+  }
+
   return (
     <>
       <Navbar />
-
       <div className="creating-container">
         <h2>Create Property Listing</h2>
         <form className="creating" onSubmit={handleSubmit}>
           <TextFieldsAndCheckbox data={data} handleChange={handleChange} />
-
           <ImageUpload handleFileChange={handleFileChange} createImagePreviews={createImagePreviews} />
           <button type="submit" className="submit-btn">Create</button>
         </form>
       </div>
-
       <Footer />
     </>
   );

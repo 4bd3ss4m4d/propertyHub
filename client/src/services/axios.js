@@ -7,6 +7,8 @@ const axiosWithHeader = axios.create({
 
 // Optionally, you can set the token here if it exists in local storage
 const token = localStorage.getItem('token');
+console.log(`Token is ${token}`);
+
 if (token) {
     axiosWithHeader.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 }

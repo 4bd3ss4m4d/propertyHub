@@ -21,13 +21,53 @@
 .property-image {
     width: 100%;
     height: 400px;
-    object-fit: cover;
+    object-fit:fill;
 }
 
 /* Property details section */
 .property-details {
     padding: 20px;
     text-align: left;
+}
+
+/* Styling for additional buttons container */
+.additional-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Adds space between buttons */
+    margin: 2rem auto;
+    max-width: 400px; /* Restricts width to avoid stretching */
+}
+
+/* General button styles */
+.additional-buttons button {
+    padding: 0.75rem 1.5rem; /* Increased padding for a larger click area */
+    font-size: 1rem; /* Slightly larger font for readability */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white; /* Set text color to white */
+    transition: all 0.3s ease; /* Smooth transition for hover effects */
+}
+
+/* Specific styles for the delete button */
+.delete-listing {
+    background-color: #e04040;
+}
+
+.delete-listing:hover {
+    background-color: #c0392b; /* Darker shade on hover */
+    transform: scale(1.05); /* Slightly enlarges the button on hover */
+}
+
+/* Specific styles for the edit button */
+.editing-listing {
+    background-color: #86bd33;
+}
+
+.editing-listing:hover {
+    background-color: #60a626; /* Darker shade on hover */
+    transform: scale(1.05); /* Slightly enlarges the button on hover */
 }
 
 /* Property title */
@@ -119,4 +159,14 @@
     .property-price {
         font-size: 1.25em;
     }
+        .additional-buttons {
+            flex-direction: column; /* Stack buttons vertically */
+            align-items: center; /* Center align in the column layout */
+        }
+    
+        .additional-buttons button {
+            width: 80%; /* Make buttons take up more width on small screens */
+        
+    }
+    
 }

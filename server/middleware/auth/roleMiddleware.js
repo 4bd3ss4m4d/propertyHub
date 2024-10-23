@@ -133,6 +133,8 @@ export const checkIsAdminOrOwnerOrAgent = async (req, res, next) => {
   const { id: propertyId } = req.params;
   const { role, id: userId } = req.user;
 
+  
+
   try {
     // If the user is an admin or super-admin, allow the update
     if (role === 'admin' || role === 'super-admin') {
@@ -140,12 +142,16 @@ export const checkIsAdminOrOwnerOrAgent = async (req, res, next) => {
     }
 
     const property = await Property.findById(propertyId);
-
+    console.log(property);
+    
+    
+    
     if (!property) {
       return next(new NotFoundError(`Property with ID ${propertyId} not found`));
     }
  
     console.log(property.userId, userId);
+    
     // Check if `userId` is set on the property and compare with the logged-in user
     if (property.userId && property.userId.toString() === userId.toString()) {
       return next();
