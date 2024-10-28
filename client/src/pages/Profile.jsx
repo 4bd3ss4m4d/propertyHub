@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useSelector } from "react-redux";
 import '../assets/styles/profile.css';
-import {  useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar";
 import axios from "axios";
 import { SignOut } from "../services/authServices";
@@ -84,6 +84,10 @@ export default function Profile() {
         }
       };
 
+    const ShowListing = ()=>{
+        navigate('/my-listing')
+    }
+
     return (
         <>
             {currentUser && (
@@ -156,7 +160,7 @@ export default function Profile() {
                         </div>
 
                         <button className="profile-toggle-btn" onClick={navigateateToCreate}>Create Listing</button>
-                        <button className="profile-toggle-btn">Show My Listing</button>
+                        <button className="profile-toggle-btn" onClick={ShowListing}>Show My Listing</button>
                         <button className="profile-toggle-btn" onClick={handleSignout}>Sign Out</button>
                     </div>
                 </>

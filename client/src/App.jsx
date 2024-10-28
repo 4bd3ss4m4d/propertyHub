@@ -12,6 +12,7 @@ const AuthFailure = lazy(() => import("./pages/AuthStatus").then(module => ({ de
 const Profile = lazy(() => import("./pages/Profile"));
 const Create = lazy(() => import("./pages/Create"));
 const ShowListing = lazy(() => import("./pages/ShowListing"));
+const MyListing = lazy(()=> import("./pages/MyListing"))
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           <Route path="/profile" element={<Profile />} /> 
           <Route path="/create" element={<Create />} /> 
           <Route path="/listing/:id" element={<ShowListing />} />
+          <Route path="/my-listing" element={<MyListing />} /> 
         </Routes>
       </Suspense>
     </BrowserRouter>
