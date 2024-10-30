@@ -737,7 +737,9 @@ POST /api/properties
   "coordinates": {
     "lat": 33.5731,
     "lng": -7.5898
-  }
+  },
+  "agentId": "671305e3bfbb0b7b2ffa0cbb",
+  "userId": "672211ff6a1a5418f1fe815e"
 }
 ```
 Response
