@@ -1,38 +1,37 @@
 export default {
-  // The root directory that Jest should scan for tests and modules
   rootDir: './',
-
-  // Specifies the test files to match
   testMatch: [
-    '**/__tests__/**/*.test.js', // Match test files inside __tests__ folders
-    '**/?(*.)+(spec|test).[jt]s?(x)', // Match .spec.js/.test.js/.jsx/.ts/.tsx files
+    '**/__tests__/**/*.test.js',
+    '**/?(*.)+(spec|test).[jt]s?(x)',
   ],
-
-  // Transform files using babel-jest to handle ES6 syntax
-  transform: {
-    '^.+\\.js$': 'babel-jest', // Use babel-jest to transform ES modules
-  },
-
-  // Automatically clear mock calls and instances between every test
+  transform: {}, // Empty transform object for native ESM
   clearMocks: true,
-
-  // Specify the test environment for Node.js applications
+  resetMocks: false,
+  restoreMocks: false,
   testEnvironment: 'node',
+  
+  // Remove extensionsToTreatAsEsm since we're using "type": "module"
+  
+  moduleNameMapper: {
+    "^@/(.*)$": "<rootDir>/$1",
+    "^__tests__/(.*)$": "<rootDir>/__tests__/$1"
+  },
+  
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  testTimeout: 20000,
 
-  // Collect coverage from these files
   collectCoverage: true,
   collectCoverageFrom: [
     '**/utils/**/*.js',
     '**/controllers/**/*.js',
     '**/services/**/*.js',
     '**/models/**/*.js',
-    '!**/node_modules/**',  // Exclude node_modules
-    '!**/config/**',        // Exclude config files
+    '!**/node_modules/**',
+    '!**/config/**',
   ],
-  coverageDirectory: './coverage', // Directory for storing coverage reports
+  coverageDirectory: './coverage',
 
-  // Ignore transforming node_modules, unless specific modules need to be transformed
   transformIgnorePatterns: [
-    '/node_modules/'  // Ignore node_modules (default)
+    '/node_modules/',
   ],
 };
