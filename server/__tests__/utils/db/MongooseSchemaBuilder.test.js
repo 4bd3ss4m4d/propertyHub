@@ -10,8 +10,8 @@
  * - CRUD operations using Mockingoose to simulate Mongoose database interactions
  * 
  * Dependencies:
- * - mockingoose: Used to mock Mongoose models for isolated unit tests without requiring a live MongoDB instance.
  * - jest: The testing framework used for assertions and test organization.
+ * - mockingoose: Used to mock Mongoose models for isolated unit tests without requiring a live MongoDB instance.
  */
 
 import { MongooseSchemaBuilder } from '@/utils/db/MongooseSchemaBuilder';

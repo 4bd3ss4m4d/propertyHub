@@ -13,8 +13,8 @@
  */
 
 import mongoose from 'mongoose';
-import ERROR_MESSAGES from '../../constants/errorMessages.js';
 import { ConfigurationError } from '../errors/customErrors.js';
+import ERROR_MESSAGES from '../../constants/errorMessages.js';
 
 
 /**
