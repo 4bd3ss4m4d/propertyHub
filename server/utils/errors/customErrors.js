@@ -34,7 +34,7 @@
 import ERROR_MESSAGES from '../../constants/errorMessages.js';
 import HTTP_STATUS_CODES from '../../constants/httpStatusCodes.js';
 
-class CustomError extends Error {
+export class CustomError extends Error {
     /**
      * Base error class for all custom errors.
      * @param {string} message - The error message.
