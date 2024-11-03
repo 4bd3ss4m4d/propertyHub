@@ -45,7 +45,7 @@ import {
     UnprocessableEntityError,
     ServerError,
     MongooseValidationError,
-  } from '@/utils/errors/customErrors';
+  } from '@/utils/errors/CustomErrors';
 import ERROR_MESSAGES from '@/constants/errorMessages';
 import HTTP_STATUS_CODES from '@/constants/httpStatusCodes';
   
