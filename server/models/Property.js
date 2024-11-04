@@ -24,7 +24,7 @@ const propertySchema = new mongoose.Schema({
   phoneNumber: {
     type: String,
     required: [true, 'Phone number is required.'],
-    match: [/^\+?[1-9]\d{1,14}$/, 'Please provide a valid phone number.'], // E.164 format
+    
   },
   price: {
     type: Number,
@@ -105,13 +105,11 @@ const propertySchema = new mongoose.Schema({
     },
     zipCode: {
       type: String,
-      required: [true, 'Zip code is required.'],
-      match: [/^\d{5}(-\d{4})?$/, 'Please provide a valid zip code.']
     },
     country: {
       type: String,
       required: [true, 'Country is required.'],
-      default: 'USA'
+      default: 'Morocco'
     }
   },
   images: [
@@ -125,16 +123,8 @@ const propertySchema = new mongoose.Schema({
       }
     }
   ],
-  amenities: {
-    type: [String],
-    default: [],
-    validate: {
-      validator: function (amenitiesArray) {
-        return amenitiesArray.every(amenity => typeof amenity === 'string');
-      },
-      message: 'All amenities must be valid strings.'
-    }
-  },
+ 
+ 
   agentId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User', // Reference to the User (agent/owner) model
@@ -144,20 +134,7 @@ const propertySchema = new mongoose.Schema({
     type: Boolean,
     default: false, // Boolean to mark properties as featured listings
   },
-  coordinates: {
-    lat: {
-      type: Number,
-      required: [true, 'Latitude is required.'],
-      min: [-90, 'Latitude must be between -90 and 90 degrees.'],
-      max: [90, 'Latitude must be between -90 and 90 degrees.']
-    },
-    lng: {
-      type: Number,
-      required: [true, 'Longitude is required.'],
-      min: [-180, 'Longitude must be between -180 and 180 degrees.'],
-      max: [180, 'Longitude must be between -180 and 180 degrees.']
-    }
-  },
+
   createdAt: {
     type: Date,
     default: Date.now

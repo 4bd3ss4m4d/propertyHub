@@ -12,6 +12,7 @@ import { ValidationError } from '../../utils/customErrors.js';  // Use your cust
  */
 export const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
+  console.log("THIS IS THE ERROR", errors)
 
   if (!errors.isEmpty()) {
     // Format validation errors: Each error includes only the field and its message

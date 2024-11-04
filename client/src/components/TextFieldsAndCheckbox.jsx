@@ -60,9 +60,9 @@ export default function TextFieldsAndCheckbox({ data, handleChange }) {
       {/* Phone Number */}
       <input
         type="text"
-        placeholder="Phone"
-        name="phone"
-        value={data.phone}
+        placeholder="phone Number"
+        name="phoneNumber"
+        value={data.phoneNumber}
         onChange={handleChange}
         required
       />

@@ -7,18 +7,19 @@ import TextFieldsAndCheckbox from "../components/TextFieldsAndCheckbox";
 import ImageUpload from "../components/ImageUpload";
 import Footer from "../components/Footer";
 import axiosWithHeader from "../services/axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Create() { 
 
-
-  const API_URL = import.meta.env.VITE_API_URL;
-  const { currentUser } = useSelector((state) => state.user); // Access the logged-in user
+  const { currentUser } = useSelector((state) => state.user); // Access the logged-in user  
+  const navigate = useNavigate()
 
   const [images, setImages] = useState([]);
   const [data, setData] = useState({
     title: '',
     description: '',
     propertyType: '',
+    agentId: currentUser.id,
     price: '', // Will be converted to a number
     size: '',  // Will be converted to a number
     yearBuilt: '',
@@ -40,7 +41,6 @@ export default function Create() {
     images: [], // Placeholder for image URLs after upload
     phoneNumber: '',
     status: 'Available', // Default status
-    amenities: [], // Placeholder for amenities
     isFeatured: false, // Track if the listing is featured
   });
 
@@ -113,11 +113,17 @@ export default function Create() {
     // Send the data to the backend with JWT token in headers
     try {
       await axiosWithHeader.post(`/api/properties`, updatedData)
-      .then((response)=>{console.log(response)});
-      alert("Lesting created successfully.")
+      .then((response)=>{
+        alert("Lesting created successfully.")
+        navigate( `/listing/${response.data.data._id}`)  
+        });
+      
+      
+
       
 
     } catch (error) {
+      alert("Error creating listing; Please try again later")
       console.error("Error creating listing:", error);
     }
   };

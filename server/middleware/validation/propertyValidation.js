@@ -15,7 +15,7 @@ export const validatePropertyFields = [
 
   body('phoneNumber')
   .notEmpty().withMessage('Phone number is required.')
-  .matches(/^\+?[1-9]\d{1,14}$/).withMessage('Please provide a valid phone number.'),
+  .matches(/^[\d()-\s]{10,14}$/).withMessage('Phone number must contain 10 digits.'),
 
   body('propertyType')
     .notEmpty().withMessage('Property type is required.')
@@ -84,22 +84,7 @@ export const validatePropertyFields = [
     .isURL().withMessage('Each image must be a valid URL (jpg, jpeg, png, or webp).')
     .matches(/\.(jpg|jpeg|png|webp)$/).withMessage('Image must be a valid format: jpg, jpeg, png, or webp.'),
 
-  body('amenities')
-    .optional()
-    .isArray().withMessage('Amenities must be an array of strings.')
-    .custom((amenities) => {
-      return amenities.every(amenity => typeof amenity === 'string');
-    }).withMessage('All amenities must be valid strings.'),
-
   body('isFeatured')
     .optional()
     .isBoolean().withMessage('isFeatured must be a boolean value.'),
-
-  body('coordinates.lat')
-    .optional()
-    .isFloat({ min: -90, max: 90 }).withMessage('Latitude must be between -90 and 90 degrees.'),
-
-  body('coordinates.lng')
-    .optional()
-    .isFloat({ min: -180, max: 180 }).withMessage('Longitude must be between -180 and 180 degrees.')
 ];

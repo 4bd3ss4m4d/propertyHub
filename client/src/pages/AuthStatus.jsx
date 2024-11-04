@@ -48,6 +48,7 @@ export const AuthSuccess = ({ type = "SignUp" }) => {  // Default type is "SignU
     const timer = setTimeout(() => {
       const token = searchParams.get('token');
       if (token){
+      localStorage.setItem(import.meta.env.VITE_JWT_COOKIE_NAME, token);
       const decoded = jwtDecode(token);
       dispatch(setUser(decoded));}
       navigate('/');
