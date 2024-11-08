@@ -26,6 +26,9 @@ const VALIDATION_MESSAGES = {
         TWITTER_URL: 'Please enter a valid Twitter URL',
         LINKEDIN_URL: 'Please enter a valid LinkedIn URL',
         IP_ADDRESS: 'Please enter a valid IP address',
+        CURRENCY_CODE: 'Please enter a valid ISO 4217 currency code',
+        LANGUAGE_CODE: 'Please enter a valid ISO 639-1 language code',
+        TIMEZONE: 'Please enter a valid IANA timezone',
     },
 };
 

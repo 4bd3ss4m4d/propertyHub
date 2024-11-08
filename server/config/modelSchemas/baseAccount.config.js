@@ -1,84 +1,39 @@
-/**
- * BaseAccountModelConfig Schema Configuration
- * 
- * This configuration file defines the schema structure, validation rules, 
- * and data handling methods for the base account model in a Mongoose-based 
- * application. It includes validation constraints, data transformation hooks, 
- * instance and static methods, and soft deletion functionality to prevent 
- * permanent deletions.
- * 
- * Schema Fields:
- * - **username**: A required, unique, lowercase string with constraints on length 
- *   and format.
- * - **email**: A required, unique, lowercase string, validated against a pattern.
- * - **password**: A required, secure string that is hashed before saving.
- * - **phoneNumber**: An optional string validated against a phone number pattern.
- * - **profile**: Contains `firstName`, `lastName`, and `avatar`, with each having 
- *   length and format constraints.
- * - **address**: Stores address information with fields for street, city, state, 
- *   zipCode, and country.
- * - **accountStatus**: Enum representing account status (`active`, `pending`, 
- *   `suspended`, `deactivated`), with a default of `pending`.
- * - **role**: Enum representing the user’s role (`user`, `agent`, `admin`), with 
- *   `user` as default.
- * - **socialMediaLinks**: Object containing optional social media URLs (e.g., 
- *   Facebook, LinkedIn) validated by regex patterns.
- * - **security**: Contains fields for login attempts tracking, email verification, 
- *   and authentication tokens.
- * - **loginHistory**: An array of login records, each containing IP address, login 
- *   timestamp, success status, and user agent.
- * 
- * Options:
- * - Timestamps: Automatically adds `createdAt` and `updatedAt` fields.
- * - `toJSON` and `toObject` transformations: Removes sensitive data (`password`, 
- *   `__v`) before serialization.
- * - Indexes: Unique indexes for username and email, and additional indexes for 
- *   optimization.
- * 
- * Schema Hooks:
- * - **Pre-save**: Hashes passwords if modified, and normalizes fields like email 
- *   and names.
- * - **Pre-find**: Restricts queries to return only active accounts by default.
- * - **Pre-validate**: Normalizes input data for consistent format.
- * - **Pre-findOneAndDelete**: Converts deletions to soft deletions by updating 
- *   `accountStatus` to `deactivated` and adding a `deletedAt` timestamp.
- * - **Post-save**: Removes password from returned documents and logs account 
- *   status changes.
- * 
- * Instance Methods:
- * - **comparePassword**: Compares a given password to the stored hashed password.
- * - **updateLastLogin**: Updates the `lastLogin` timestamp.
- * - **incrementFailedLogins**: Increases `failedLoginAttempts` and locks account 
- *   after repeated failed logins.
- * - **resetFailedLogins**: Resets failed login attempts and unlocks the account.
- * - **isLocked**: Checks if the account is currently locked.
- * - **generateEmailVerificationToken**: Creates and stores a token for email 
- *   verification.
- * - **verifyEmail**: Validates an email verification token and marks the email 
- *   as verified.
- * 
- * Static Methods:
- * - **findByEmail**: Finds an active user by email.
- * - **findByUsername**: Finds an active user by username.
- * - **findByIdActiveOnly**: Finds an active user by ID.
- * - **findByEmailOrUsername**: Finds an active user by email or username.
- * - **searchUsers**: Searches for active users by name or email.
- * - **lockUserById**: Updates a user's `accountStatus` to `suspended`.
- * - **softDelete**: Performs a soft delete by deactivating an account and setting 
- *   `deletedAt` timestamp.
- * 
- * Virtuals:
- * - **fullName**: Concatenates `firstName` and `lastName` from the profile.
- * - **lockedStatus**: Checks if the account is currently locked based on the 
- *   `lockUntil` timestamp.
- */
-
-import bcrypt from 'bcrypt';
-import crypto from 'crypto';
 import REQUIRED_FIELDS from '../../constants/requiredFields.js';
 import VALIDATION_MESSAGES from '../../constants/validationMessages.js';
 import INPUT_CONSTRAINTS from '../../constants/inputConstraints.js';
 import REGEX_PATTERNS from '../../constants/regex.js';
+import { 
+  validateCurrency, 
+  validateLanguage, 
+  validateTimezone 
+} from '../../utils/validators/validationFunctions.js';
+import {
+  preSave,
+  preFind,
+} from '../../utils/models/baseAccountModel/baseAccountHooks.js';
+import {
+  comparePassword,
+  updateLastLogin,
+  incrementFailedLogins,
+  resetFailedLogins,
+  isLocked,
+  generateEmailVerificationToken,
+  verifyEmail,
+  addLoginHistory,
+} from '../../utils/models/baseAccountModel/baseAccountMethods.js';
+import { 
+  findByEmail,
+  findByUsername,
+  findByIdActiveOnly,
+  findByEmailOrUsername,
+  searchUser,
+  lockUserById,
+  softDelete,
+} from '../../utils/models/baseAccountModel/baseAccountStatics.js';
+import { 
+  fullName,
+  lockedStatus,
+ } from '../../utils/models/baseAccountModel/baseAccountVirtuals.js';
 
 
 export const baseAccountModelConfig = {
@@ -138,6 +93,7 @@ export const baseAccountModelConfig = {
     phoneNumber: {
       type: String,
       trim: true,
+      unique: true,
       match: [
         REGEX_PATTERNS.VALIDATION_PATTERNS.PHONE_NUMBER, 
         VALIDATION_MESSAGES.FORMAT.PHONE_PATTERN
@@ -185,6 +141,23 @@ export const baseAccountModelConfig = {
         ],
       },
     },
+    oauth: {
+      googleId: { 
+        type: String, 
+        unique: true, 
+        sparse: true 
+      },
+      microsoftId: { 
+        type: String, 
+        unique: true, 
+        sparse: true 
+      },
+      appleId: { 
+        type: String, 
+        unique: true, 
+        sparse: true 
+      }
+    },
     address: {
       street: {
         type: String,
@@ -221,6 +194,40 @@ export const baseAccountModelConfig = {
       ],
       enum: ['user', 'agent', 'admin'],
       default: 'user',
+    },
+    // Account Configuration
+    accountConfig: {
+      usernameSource: {
+        type: String,
+        enum: ['generated', 'custom'],
+        default: 'generated'
+      },
+      displaySettings: {
+          currency: {
+            type: String,
+            default: 'USD',
+            validate: {
+              validator: validateCurrency,
+              message: VALIDATION_MESSAGES.FORMAT.CURRENCY_CODE
+            }
+          },
+          language: {
+            type: String,
+            default: 'en',
+            validate: {
+              validator: validateLanguage,
+              message: VALIDATION_MESSAGES.FORMAT.LANGUAGE_CODE
+            }
+          },
+          timezone: {
+            type: String,
+            default: 'UTC',
+            validate: {
+              validator: validateTimezone,
+              message: VALIDATION_MESSAGES.FORMAT.TIMEZONE
+            }
+          }
+      }
     },
     socialMediaLinks: {
       facebook: {
@@ -283,6 +290,10 @@ export const baseAccountModelConfig = {
         },
       },
     },
+    deletedAt: {
+      type: Date,
+      default: null,
+    },
     loginHistory: [
       {
         ipAddress: {
@@ -304,7 +315,6 @@ export const baseAccountModelConfig = {
         },
         success: {
           type: Boolean,
-          required: true,
           default: false,
         },
         userAgent: {
@@ -334,7 +344,7 @@ export const baseAccountModelConfig = {
     indexes: [
       { fields: { username: 1 }, options: { unique: true, sparse: true } },
       { fields: { email: 1 }, options: { unique: true } },
-      { fields: { phoneNumber: 1 }, options: { sparse: true } },
+      { fields: { phoneNumber: 1 }, options: { unique: true } },
       { fields: { accountStatus: 1 }, options: { background: true } },
       { fields: { 'profile.firstName': 1, 'profile.lastName': 1 }, options: { background: true } },
       { fields: { createdAt: 1 }, options: { background: true } }
@@ -343,187 +353,47 @@ export const baseAccountModelConfig = {
 
   hooks: {
     pre: {
-      // Hash password before saving
-      save: async function(next) {
-        if (!this.isModified('password')) return next();
-        try {
-          const salt = await bcrypt.genSalt(10);
-          this.password = await bcrypt.hash(this.password, salt);
-          next();
-        } catch (error) {
-          next(error);
-        }
-      },
+      // Hash password before saving and normalize fields
+      save: preSave,
       // Find user by email or username and return only active accounts
-      find: function(next) {
-        // Don't return suspended/deactivated accounts by default
-        if (!this.getQuery().accountStatus) {
-          this.where({ accountStatus: 'active' });
-        }
-        next();
-      },
-      // Add  email, firstName, and lastName normalization
-      validate: function(next) {
-        if (this.email) {
-          this.email = this.email.trim().toLowerCase();
-        }
-        if (this.profile.firstName) {
-          this.profile.firstName = this.profile.firstName.trim().replace(
-            /\b\w/g, char => char.toUpperCase() // Capitalize the first letter
-          );
-        }
-        if (this.profile.lastName) {
-          this.profile.lastName = this.profile.lastName.trim().replace(
-            /\b\w/g, char => char.toUpperCase() // Capitalize the first letter
-          );
-        }
-        next();
-      },
-      // Soft delete prevention
-      findOneAndDelete: function(next) {
-        this.options.runValidators = true;
-        this.setUpdate({ 
-          accountStatus: 'deactivated',
-          deletedAt: new Date() 
-        });
-        next();
-      }
+      find: preFind,
     },
     post: {
-      // Remove sensitive data from the returned document after save()
-      save: function(doc) {
-        doc.password = undefined;
-      },
-      // Log account status changes
-      save: function(doc) {
-        if (doc.isModified('accountStatus')) {
-          console.log(`Account status changed for user ${doc._id}: ${doc.accountStatus}`);
-        }
-      },
+     
     },
   },
 
   methods: {
     // Compare password for login
-    async comparePassword(candidatePassword) {
-      try {
-        // Need to select password since it's not included by default
-        const user = await this.constructor.findById(this._id).select('+password');
-        return await bcrypt.compare(candidatePassword, user.password);
-      } catch (error) {
-        throw new Error('Password comparison failed');
-      }
-    },
+    comparePassword,
     // Update last login timestamp
-    async updateLastLogin() {
-      this.lastLogin = new Date();
-      await this.save();
-    },
+    updateLastLogin,
     // Increment failed login attempts and lock account if necessary
-    async incrementFailedLogins() {
-      const MAX_ATTEMPTS = 5;
-      const LOCK_TIME = 15 * 60 * 1000; // 15 minutes
-      
-      this.failedLoginAttempts = (this.failedLoginAttempts || 0) + 1;
-      if (this.failedLoginAttempts >= MAX_ATTEMPTS) {
-        this.lockUntil = new Date(Date.now() + LOCK_TIME);
-      }
-      await this.save();
-    },
+    incrementFailedLogins,
     // Reset failed login attempts and lock status
-    async resetFailedLogins() {
-      this.failedLoginAttempts = 0;
-      this.lockUntil = null;
-      await this.save();
-    },
+    resetFailedLogins,
     // Check if account is locked
-    isLocked() {
-      return this.lockUntil && this.lockUntil > Date.now();
-    },
+    isLocked,
     // Generate email verification token
-    async generateEmailVerificationToken() {
-      const token = crypto.randomBytes(32).toString('hex');
-      this.security.emailVerificationToken = token;
-      await this.save();
-      return token;
-    },
+    generateEmailVerificationToken,
     // Verify email 
-    async verifyEmail(token) {
-      if (this.security.emailVerificationToken !== token) {
-        throw new Error('Invalid verification token');
-      }
-      
-      this.security.isEmailVerified = true;
-      this.security.emailVerificationToken = undefined;
-      await this.save();
-      return this;
-    },
+    verifyEmail,
+    // Add login History
+    addLoginHistory,
   },
 
   statics: {
-    async findByEmail(email) {
-      return this.findOne({ email, accountStatus: 'active' });
-    },
-  
-    async findByUsername(username) {
-      return this.findOne({ username, accountStatus: 'active' });
-    },
-  
-    async findByIdActiveOnly(id) {
-      return this.findOne({ _id: id, accountStatus: 'active' });
-    },
-  
-    async findByEmailOrUsername(identifier) {
-      return this.findOne({
-        $or: [{ email: identifier }, { username: identifier }],
-        accountStatus: 'active'
-      });
-    },
-  
-    async searchUsers(query) {
-      return this.find({
-        accountStatus: 'active',
-        $or: [
-          { 'profile.firstName': new RegExp(query, 'i') },
-          { 'profile.lastName': new RegExp(query, 'i') },
-          { email: new RegExp(query, 'i') }
-        ]
-      });
-    },
-  
-    async lockUserById(id) {
-      return this.findByIdAndUpdate(id, { accountStatus: 'suspended' }, { new: true });
-    },
-
-    async softDelete(query) {
-      const doc = await this.findOne(query);
-      if (!doc) {
-        throw new Error('Document not found');
-      }
-  
-      // Prevent permanent deletion
-      if (doc.accountStatus === 'deactivated') {
-        throw new Error('Permanent deletion is not allowed. Use soft delete.');
-      }
-  
-      // Perform a soft delete by setting accountStatus to 'deactivated'
-      doc.accountStatus = 'deactivated';
-      doc.deletedAt = new Date();
-      await doc.save();
-      return doc;
-    },
+    findByEmail,
+    findByUsername,
+    findByIdActiveOnly,
+    findByEmailOrUsername,
+    searchUser,
+    lockUserById,
+    softDelete,
   },
 
   virtuals: {
-    fullName: {
-      get() {
-        return `${this.profile.firstName} ${this.profile.lastName}`;
-      },
-    },
-    lockedStatus: { 
-      get() {
-        return this.lockUntil && this.lockUntil > Date.now();
-      },
-    },
+    fullName: fullName,
+    lockedStatus: lockedStatus,
   },
 };
